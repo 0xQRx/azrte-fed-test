@@ -1,6 +1,5 @@
 name: Get Flag
-on:
-  workflow_dispatch:
+on: [workflow_dispatch]
 
 permissions:
   id-token: write
@@ -10,23 +9,9 @@ jobs:
   get-flag:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Azure Login (OIDC Federated Identity)
+      - name: Azure login
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: true
-      - name: Download Flag from Blob
-        run: |
-          az storage blob download \
-            --account-name iamazurelab3d26800f7 \
-            --container-name flag \
-            --name flag.txt \
-            --file ./flag.txt \
-            --auth-mode login
-      - name: Read Flag
-        run: cat ./flag.txt
