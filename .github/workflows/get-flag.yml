@@ -1,0 +1,33 @@
+name: Get Flag from Azure
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write  # Required for OIDC login
+  contents: read
+
+jobs:
+  get-flag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Azure Login via OIDC
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Download flag blob
+        run: |
+          az storage blob download \
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
+            --container-name ${{ secrets.AZURE_CONTAINER }} \
+            --name ${{ secrets.BLOB_NAME }} \
+            --file flag.txt \
+            --auth-mode login
+          echo "Flag contents:"
+          cat flag.txt
